@@ -9,7 +9,7 @@ module Api
       end
 
       def show
-        render json: { status: 'success', message: 'Posts loaded successfully', data: @posts }
+        render json: { status: 'success', message: 'Posts loaded successfully', data: @post }
       end
 
       def create
@@ -17,7 +17,7 @@ module Api
         if post.save
           render json: { status: 'success', message: 'Posts successfully created', data: post }
         else
-          render json: { status: 'error', message: 'Posts could not be created', data: @posts.errors }
+          render json: { status: 'error', message: 'Posts could not be created', data: post.errors }
         end
       end
 
