@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Posts", type: :request do
+RSpec.describe 'Posts', type: :request do
   let!(:post) { create(:post) }
 
   describe 'GET /api/v1/posts #index' do
@@ -41,16 +43,18 @@ RSpec.describe "Posts", type: :request do
       post '/api/v1/posts', params: params
     end
     context 'when valid parameters' do
-      let(:params) {{
-        title:'test title',
-        content: 'test content'
-      }}
+      let(:params) do
+        {
+          title: 'test title',
+          content: 'test content'
+        }
+      end
       it 'returns http success' do
         expect(response.status).to eq 200
       end
 
       it 'responses must be correct' do
-        expect(JSON.parse(response.body)['status']).to eq("success")
+        expect(JSON.parse(response.body)['status']).to eq('success')
       end
 
       it 'increases post data' do
@@ -71,7 +75,7 @@ RSpec.describe "Posts", type: :request do
 
       it 'responses must be correct' do
         put "/api/v1/posts/#{post.id}", params: { post: valid_post_params }
-        expect(JSON.parse(response.body)['status']).to eq("success")
+        expect(JSON.parse(response.body)['status']).to eq('success')
       end
     end
   end
