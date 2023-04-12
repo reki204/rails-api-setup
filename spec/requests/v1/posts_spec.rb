@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Posts', type: :request do
-
   describe 'GET /api/v1/posts #index' do
     it 'returns http success ' do
       get '/api/v1/posts'
@@ -58,7 +57,7 @@ RSpec.describe 'Posts', type: :request do
         expect(JSON.parse(response.body)['status']).to eq('error')
         expect(JSON.parse(response.body)['message']).to eq('Posts could not be created')
       end
-  
+
       it 'when invalid parameters does not increase post data' do
         expect { post '/api/v1/posts', params: { post: invalid_post_params } }.to_not change(Post, :count)
       end
