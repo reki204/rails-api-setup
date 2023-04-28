@@ -1,0 +1,71 @@
+env:
+  RUBY_VERSION: 3.0.3
+  RAILS_ENV: test
+  POSTGRES_USER: postgres
+  PGHOST: db
+  POSTGRES_PASSWORD: password
+  POSTGRES_DB: myapp_test
+
+name: "Lint check"
+on: [push]
+jobs:
+  rspec:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Ruby 3.0.3
+        uses: ruby/setup-ruby@v1.146.0
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+
+      - name: Run migration
+        env:
+          RAILS_ENV: ${{ env.RAILS_ENV }}
+          PGHOST: ${{ env.PGHOST }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          cp ./config/database.yml.ci ./config/database.yml
+          bundle exec rake db:create RAILS_ENV=test
+          bundle exec rails db:create RAILS_ENV=test
+          bundle exec rails db:migrate RAILS_ENV=test
+
+      - name: Run rspec
+        run: bundle exec rspec
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1.146.0
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+#       - name: Security audit dependencies
+#         run: bin/bundler-audit --update
+
+#       - name: Security audit application code
+#         run: bin/brakeman -q -w2
+
+      - name: yarn install
+        run: yarn install --check-files
+        
+      - name: Run rubocop
+        run: bundle exec rubocop
+
+      - name: Run rails best practices
+        run: bundle exec rails_best_practices -e node_modules
